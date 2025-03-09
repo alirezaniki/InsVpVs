@@ -1,24 +1,22 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import numpy as np
-import matplotlib.pyplot as plt
-
+from sklearn.linear_model import RANSACRegressor, HuberRegressor, LinearRegression
+import sys
 
 '''
-
 a code to calculate in situ Vp/Vs ratio using P and S differential 
 times from a tight cluster of events.
-
-Input file: dt.cc from hypoDD program
--input file format (see example dt.cc file):
-# event_ID1     event_ID2
-station     differential_time       CC    phase
-
 '''
 
-
-ccfile = 'dt.cc'        # input file
-cc_th = 0.8             # cc threshold (applies to CC values in the input file)
+# FDTCC/hypoDD
+input_format = 'FDTCC'
+# IRLS (Iteratively Reweighted Least Squares); OLS (Ordinary Least Square)
+# HUBER (Huber regression); RANSAC (RANdom SAmple Consensus)
+fit_method = 'IRLS'
+# Input file
+ccfile = 'dt.cc'
+# CC threshold (applies to CC values in the input file from FDTCC only)
+cc_th = 0.85
 
 
 def get_mean(dicp, dics):
@@ -48,8 +46,13 @@ def sort_things_out(inpfile, ccth):
                 dict_p = {}
                 dict_s = {}                
                 continue
-        
-            sta, diff, cc, phase = row.split()
+            
+            if input_format == 'FDTCC':
+                sta, diff, cc, phase = row.split()
+            else:
+                sta, tt1, tt2, cc, phase = row.split()
+                diff = float(tt1) - float(tt2)
+
             if phase == 'P' and float(cc) >= ccth:
                 dict_p[sta] = diff
             elif phase == 'S' and float(cc) >= ccth:
@@ -66,22 +69,17 @@ def sort_things_out(inpfile, ccth):
     return np.array(pp), np.array(ss)
 
 
-
 def huber_weight(residuals, delta=1.0):
-    # Compute Huber weights based on residuals
     return 1 / (1 + (residuals / delta) ** 2)
 
 
 def irls_regression(X, y, max_iter=10, tol=1e-6, delta=1.0):
-    # Perform Iteratively Reweighted Least Squares (IRLS) regression
 
     X = np.c_[np.ones(X.shape[0]), X]  
     weights = np.ones(len(y)) 
-
     for _ in range(max_iter):
         W = np.diag(weights)  
         beta = np.linalg.inv(X.T @ W @ X) @ X.T @ W @ y  
-
         residuals = y - X @ beta
         new_weights = huber_weight(residuals, delta=delta)
 
@@ -95,14 +93,45 @@ def irls_regression(X, y, max_iter=10, tol=1e-6, delta=1.0):
 
 # get pairs of P and S differential travel times
 diffs_p, diffs_s = sort_things_out(ccfile, cc_th)
-
-# fit the regression line
 diffs_p = diffs_p.reshape(-1, 1)
-beta = irls_regression(diffs_p, diffs_s)
-intercept, slope = beta[0], beta[1]
+
+# fit the regression line (IRLS/HUBER/OLS)
+if fit_method == 'IRLS':
+    beta = irls_regression(diffs_p, diffs_s)
+    intercept, slope = beta[0], beta[1]
+    x_range = np.linspace(min(diffs_p)-0.1, max(diffs_p)+0.1, 100)
+    y_pred = intercept + slope * x_range
+
+elif fit_method == 'HUBER':
+    huber = HuberRegressor()
+    huber.fit(diffs_p, diffs_s)
+    slope = huber.coef_[0] 
+    intercept = huber.intercept_ 
+    x_range = np.linspace(min(diffs_p)-0.1, max(diffs_p)+0.1, 100)
+    y_pred = huber.predict(x_range)
+
+elif fit_method == 'RANSAC':
+    ransac = RANSACRegressor()
+    ransac.fit(diffs_p, diffs_s)
+    slope = ransac.estimator_.coef_[0]
+    intercept = ransac.estimator_.intercept_
+    x_range = np.linspace(min(diffs_p)-0.1, max(diffs_p)+0.1, 100).reshape(-1, 1)
+    y_pred = ransac.predict(x_range)
+
+elif fit_method == 'OLS':
+    model = LinearRegression()
+    model.fit(diffs_p, diffs_s)  
+    slope = model.coef_[0]
+    intercept = model.intercept_
+    x_range = np.linspace(min(diffs_p)-0.1, max(diffs_p)+0.1, 100).reshape(-1, 1)
+    y_pred = model.predict(x_range)
+
+else:
+    print(f'\nPlease select a proper regression method: IRLS, HUBER, RANSAC, OLS')
+    sys.exit()
+
 equation = fr"$V_p/V_s = {slope:.2f}x + {intercept:.2f}$"
-x_range = np.linspace(min(diffs_p)-0.1, max(diffs_p)+0.1, 100)
-y_pred = intercept + slope * x_range
+
 
 # plot the results
 plt.scatter(diffs_p, diffs_s, color='blue', label=equation)
