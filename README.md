@@ -1,4 +1,4 @@
-A Python code to calculate the Vp/Vs ratio using pairs of P and S differential travel times from a tight cluster of events. The differential times can be provided from FDTCC (cross correlation-based differential times) or hypoDD (catalog-based differential times) programs. Several regression approaches are implemented to best fit a line to the distribution and get the Vp/Vs ratio (slope of the fitted line): 
+A Python code to calculate in situ Vp/Vs ratio using pairs of P and S differential travel times from a tight cluster of events. The differential times can be provided from FDTCC (cross correlation-based differential times) or hypoDD (catalog-based differential times) programs. Several regression approaches are implemented to best fit a line to the distribution and get the Vp/Vs ratio (slope of the fitted line): 
 1. IRLS (Iteratively Reweighted Least Squares)
 2. OLS (Ordinary Least Square)  
 3. HUBER (Huber regression)
