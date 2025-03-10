@@ -137,10 +137,11 @@ equation = fr"$V_p/V_s = {slope:.2f}x + {intercept:.2f}$"
 
 
 # plot the results
-plt.scatter(diffs_p, diffs_s, color='blue', label=equation)
+plt.scatter(diffs_p, diffs_s, facecolors='none', edgecolors='blue', label=equation)
 plt.plot(x_range, y_pred, color='red', linewidth=2)
 plt.xlabel(r"$\Delta t_p$ (s)")
 plt.ylabel(r"$\Delta t_s$ (s)")
 plt.legend()
+plt.grid(True)
 plt.savefig('vp_vs_ratio.jpg', dpi=600)
 plt.show()
