@@ -17,6 +17,6 @@ station   tt_1    tt_2    1.00    phase
 
 If dt.ct file is used, differential times are calculated as ```tt_1 - tt_2```.
 <div id="header" align="center">
-  <img src='vpvs_ratio.jpg' width='600'>
+  <img src='syn.png' width='600'>
 </div>
 
