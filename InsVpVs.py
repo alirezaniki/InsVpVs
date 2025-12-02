@@ -163,9 +163,9 @@ def plot_vp_vs_fit(dt_p, dt_s, estimated_R, filename, ccs, d_max=None):
     cbar = plt.colorbar(sc)
     cbar.set_label('CC values')
     plt.plot(x_line, y_robust, color='red', linewidth=2.5, 
-             label=f'Robust Fit (R={estimated_R:.3f})')
+             label=fr'Best Fit $V_p/V_s: {estimated_R:.3f}$')
     plt.plot(x_line, y_ls, color='blue', linestyle='--', alpha=0.7,
-             label=f'Standard Least Sq (Slope={slope_ls:.3f})')
+             label=fr'Least Sq $V_p/V_s: {slope_ls:.3f}$')
 
     plt.xlabel("Differential P-time ($dt_p$)")
     plt.ylabel("Differential S-time ($dt_s$)")
