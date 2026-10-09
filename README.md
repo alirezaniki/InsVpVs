@@ -17,6 +17,6 @@ station   tt_1    tt_2    1.00    phase
 
 If the ph2dt program output file is used, differential times are calculated as ```tt_1 - tt_2```.
 <div id="header" align="center">
-  <img src='syn.png' width='600'>
+  <img src='syn_vpvs.png' width='600'>
 </div>
 
