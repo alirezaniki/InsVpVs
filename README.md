@@ -3,8 +3,8 @@ A Python code to calculate in-situ Vp/Vs ratio using pairs of P and S cross-corr
 The FDTCC program can be found here:  https://github.com/MinLiu19/FDTCC  
 The ph2dt program can be found here: https://github.com/fwaldhauser/HypoDD
 
-**Input Format**  
-InsVpVs works based on dt.cc file derived from FDTCC (recommended) and dt.ct file derived from hypoDD:  
+**Input Format example**  
+
 ```
 dt.cc format:
 # event_ID1     event_ID2    0
