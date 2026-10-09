@@ -66,9 +66,14 @@ while n <= nevent:
 print(events)
 
 no = 0
+seen = set()
 for i, eve1 in enumerate(events):
     for j, eve2 in enumerate(events):
         if eve1 == eve2: continue
+        pair_key = tuple(sorted((i,j)))
+        if pair_key in seen: continue
+        seen.add(pair_key)
+
         out.write(f'#\t{i}\t{j}\t0\n')
         pp = []
         ss = []
